@@ -1,45 +1,69 @@
 import React, { useState } from "react";
-import "../imageUploader.css";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { collection, addDoc } from "firebase/firestore";
+import { db, storage } from "./firebase";  // Your firebase config
+import '../imageUploader.css'
 
 const ImageUploader = () => {
   const [images, setImages] = useState([]);
-  const [uploadProgress, setUploadProgress] = useState({});
+  const [uploadProgress, setUploadProgress] = useState([]);
   const [uploadedUrls, setUploadedUrls] = useState([]);
 
-  const handleDrop = (event) => {
-    event.preventDefault();
-    const files = Array.from(event.dataTransfer.files);
-    setImages((prev) => [...prev, ...files]);
+  // Handle file selection
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    setImages([...images, ...files]);
   };
 
-  const handleFileChange = (event) => {
-    const files = Array.from(event.target.files);
-    setImages((prev) => [...prev, ...files]);
+  // Handle drag-and-drop
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const files = Array.from(e.dataTransfer.files);
+    setImages([...images, ...files]);
   };
 
   const removeImage = (index) => {
-    const updatedImages = images.filter((_, i) => i !== index);
-    setImages(updatedImages);
+    const newImages = [...images];
+    newImages.splice(index, 1);
+    setImages(newImages);
   };
 
-  const uploadImages = () => {
-    const progress = {};
-    images.forEach((_, index) => (progress[index] = 0));
-    setUploadProgress(progress);
+  // Upload images to Firebase Storage
+  const uploadImages = async () => {
+    const newUploadProgress = [];
+    const newUploadedUrls = [];
 
-    images.forEach((image, index) => {
-      const uploadInterval = setInterval(() => {
-        setUploadProgress((prev) => {
-          const newProgress = { ...prev };
-          newProgress[index] = Math.min(100, newProgress[index] + 20);
-          if (newProgress[index] === 100) {
-            clearInterval(uploadInterval);
-            setUploadedUrls((prev) => [...prev, URL.createObjectURL(image)]);
-          }
-          return newProgress;
-        });
-      }, 500);
-    });
+    for (let i = 0; i < images.length; i++) {
+      const file = images[i];
+      const storageRef = ref(storage, `images/${file.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+
+      // Track upload progress
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          newUploadProgress[i] = progress;
+          setUploadProgress([...newUploadProgress]);
+        },
+        (error) => {
+          console.error("Upload error: ", error);
+        },
+        () => {
+          // Get download URL after successful upload
+          getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+            newUploadedUrls[i] = url;
+            setUploadedUrls([...newUploadedUrls]);
+
+            // Save image URLs to Firestore
+            addDoc(collection(db, "images"), {
+              url,
+              name: file.name,
+            });
+          });
+        }
+      );
+    }
   };
 
   return (
