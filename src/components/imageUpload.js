@@ -97,7 +97,7 @@ const ImageUploader = () => {
               </div>
             ))}
           </div>
-          <button style={{marginTop:'1rem'}} className="upload-btn" onClick={uploadImages}>
+          <button style={{marginTop:'4rem'}} className="upload-btn" onClick={uploadImages}>
             Upload Images
           </button>
         </div>
