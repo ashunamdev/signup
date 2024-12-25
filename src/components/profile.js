@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { auth, db } from "./firebase";
-import { deleteDoc, doc, getDoc } from "firebase/firestore";
+import { auth } from "./firebase";
 import { toast } from "react-toastify";
 import UploadAndDisplayImage from "./imageUpload";
 
@@ -51,6 +50,7 @@ function Profile() {
               src={userDetails.photo}
               width={"40%"}
               style={{ borderRadius: "50%" }}
+              alt=""
             />
           </div>
           <h3>Welcome {userDetails.firstName} 🙏🙏</h3>

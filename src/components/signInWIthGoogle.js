@@ -10,7 +10,6 @@ function SignInwithGoogle() {
       const user = result.user;
       if (result.user) {
         try {
-      const ashu = await getDoc(user.uid)
           await setDoc(doc(db, "Users", user.uid), {
             email: user.email,
             firstName: user.displayName,
@@ -34,7 +33,7 @@ function SignInwithGoogle() {
         style={{ display: "flex", justifyContent: "center", cursor: "pointer" }}
         onClick={googleLogin}
       >
-        <img src={require("../google.png")} width={"60%"} />
+        <img src={require("../google.png")} alt="" width={"60%"} />
       </div>
     </div>
   );
