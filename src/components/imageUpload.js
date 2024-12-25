@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { collection, addDoc } from "firebase/firestore";
 import { db, storage } from "./firebase";  // Your firebase config
+import '../imageUploader.css'
 
-const ImageUpload = () => {
+const ImageUploader = () => {
   const [images, setImages] = useState([]);
   const [uploadProgress, setUploadProgress] = useState([]);
   const [uploadedUrls, setUploadedUrls] = useState([]);
@@ -66,77 +67,84 @@ const ImageUpload = () => {
   };
 
   return (
-    <div>
+    <div className="uploader-container">
+      <h1>Image Uploader</h1>
       <div
+        className="drag-drop-area"
         onDrop={handleDrop}
         onDragOver={(e) => e.preventDefault()}
-        style={{ border: "2px dashed #ccc", padding: "20px", width: "300px", textAlign: "center" }}
       >
         <input
           type="file"
           multiple
           onChange={handleFileChange}
-          style={{ display: "none" }}
           id="file-input"
+          style={{ display: "none" }}
         />
-        <button onClick={() => document.getElementById("file-input").click()}>Select Images</button>
+        <button
+          className="select-btn"
+          onClick={() => document.getElementById("file-input").click()}
+        >
+          Select Images
+        </button>
         <p>Or drag and drop images here</p>
       </div>
 
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginTop: "20px" }}>
-        {images.map((file, index) => (
-          <div key={index} style={{ position: "relative", width: "100px", height: "100px" }}>
-            <img
-              src={URL.createObjectURL(file)}
-              alt={`preview-${index}`}
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
-            <button
-              onClick={() => removeImage(index)}
-              style={{
-                position: "absolute",
-                top: "5px",
-                right: "5px",
-                backgroundColor: "red",
-                color: "white",
-                border: "none",
-                borderRadius: "50%",
-                padding: "5px",
-              }}
-            >
-              X
-            </button>
-            <div style={{ textAlign: "center", fontSize: "12px" }}>
-              {uploadProgress[index] ? `${Math.round(uploadProgress[index])}%` : "Waiting"}
-            </div>
+      {images.length > 0 && (
+        <div className="preview-container">
+          <h2>Selected Images</h2>
+          <div className="image-grid">
+            {images.map((file, index) => (
+              <div className="image-card" key={index}>
+                <img
+                  src={URL.createObjectURL(file)}
+                  alt={`preview-${index}`}
+                  className="preview-img"
+                />
+                <button
+                  className="delete-btn"
+                  onClick={() => removeImage(index)}
+                >
+                  X
+                </button>
+                {uploadProgress[index] !== undefined && (
+                  <div className="progress-container">
+                    <div
+                      className="progress-bar"
+                      style={{ width: `${uploadProgress[index]}%` }}
+                    ></div>
+                    <span className="progress-text">
+                      {uploadProgress[index]}%
+                    </span>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+          <button className="upload-btn" onClick={uploadImages}>
+            Upload Images
+          </button>
+        </div>
+      )}
 
-      <button onClick={uploadImages} disabled={images.length === 0}>
-        Upload Images
-      </button>
-
-      <div style={{ marginTop: "20px" }}>
-        {uploadedUrls.length > 0 && (
-          <div>
-            <h3>Uploaded Images:</h3>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
-              {uploadedUrls.map((url, index) => (
-                <div key={index} style={{ width: "100px", height: "100px" }}>
-                  <img
-                    src={url}
-                    alt={`uploaded-${index}`}
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                  />
-                </div>
-              ))}
-            </div>
+      {uploadedUrls.length > 0 && (
+        <div className="uploaded-container">
+          <h2>Uploaded Images</h2>
+          <div className="image-grid">
+            {uploadedUrls.map((url, index) => (
+              <div className="image-card" key={index}>
+                <img
+                  src={url}
+                  alt={`uploaded-${index}`}
+                  className="uploaded-img"
+                />
+              </div>
+            ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default ImageUpload;
+export default ImageUploader;
