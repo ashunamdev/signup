@@ -2,36 +2,24 @@ import React, { useEffect, useState } from "react";
 import { auth } from "./firebase";
 import { toast } from "react-toastify";
 import UploadAndDisplayImage from "./imageUpload";
+import "../css/Profile.css";
+import USERICON from "../assets/user-svgrepo-com.svg";
 
 function Profile() {
   const [userDetails, setUserDetails] = useState(null);
   const fetchUserData = async () => {
     auth.onAuthStateChanged(async (user) => {
-      // console.log(user);
-
-      // const docRef = doc(db, "Users", user.uid);
-      // const docSnap = await getDoc(docRef);
-      // if (docSnap.exists()) {
-        setUserDetails(user);
-        // console.log(docSnap.data());
-      // } else {
-      //   console.log("User is not logged in");
-      // }
+      setUserDetails(user);
     });
   };
   useEffect(() => {
     fetchUserData();
   }, []);
 
+  console.log(userDetails, "user details");
   async function handleLogout() {
     try {
       await auth.signOut();
-      // const userDocRef = doc(db, "Users", userDetails.uid);
-
-      // Delete the document
-      // await deleteDoc(userDocRef);
-      // const ashu = await getDoc(userDocRef)
-      
       toast.success("User logged out Successfully", {
         position: "top-right",
       });
@@ -44,26 +32,61 @@ function Profile() {
   return (
     <div>
       {userDetails ? (
-        <>
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <img
-              src={userDetails.photo}
-              width={"40%"}
-              style={{ borderRadius: "50%" }}
-              alt=""
-            />
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              flexDirection: "column",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                width: "100%",
+              }}
+            >
+              {userDetails?.photoURL ? (
+                <img
+                  src={userDetails?.photoURL}
+                  width={"40%"}
+                  style={{ borderRadius: "50%", margin: "2rem 0" }}
+                  alt=""
+                />
+              ) : (
+                <img
+                  src={USERICON}
+                  width={"100px"}
+                  style={{
+                    borderRadius: "50%",
+                    margin: "2rem 0",
+                    border: "5px solid #35c5a8",
+                    padding: "5px",
+                  }}
+                  alt=""
+                />
+              )}
+            </div>
+            <h3>Welcome {userDetails.firstName}</h3>
+            <div>
+              <p>Email: {userDetails.email}</p>
+              {userDetails.displayName ? (
+                <p> Name: {userDetails.displayName}</p>
+              ) : null}
+            </div>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <button
+                className="btn btn-primary logout-button"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </div>
           </div>
-          <h3>Welcome {userDetails.firstName} 🙏🙏</h3>
-          <div>
-            <p>Email: {userDetails.email}</p>
-           {userDetails.firstName ?  <p>First Name: {userDetails.firstName}</p>:null}
-            {/* <p>Last Name: {userDetails.lastName}</p> */}
-          </div>
-          <button className="btn btn-primary" onClick={handleLogout}>
-            Logout
-          </button>
-          <UploadAndDisplayImage/>
-        </>
+
+          <UploadAndDisplayImage />
+        </div>
       ) : (
         <p>Loading...</p>
       )}

@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { auth, db } from "./firebase";
 import { setDoc, doc } from "firebase/firestore";
 import { toast } from "react-toastify";
+import "../css/Signin.css";
 
 function Register() {
   const [email, setEmail] = useState("");
@@ -21,13 +22,14 @@ function Register() {
           email: user.email,
           firstName: fname,
           lastName: lname,
-          photo:""
+          photo: "",
         });
       }
       console.log("User Registered Successfully!!");
       toast.success("User Registered Successfully!!", {
         position: "top-right",
       });
+      window.location.href = "/profile";
     } catch (error) {
       console.log(error.message);
       toast.error(error.message, {

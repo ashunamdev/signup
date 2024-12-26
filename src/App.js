@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
-import "./App.css";
+import "./css/App.css";
 import {
   BrowserRouter as Router,
   Routes,

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../imageUploader.css";
+import "../css/imageUploader.css";
 
 const ImageUploader = () => {
   const [images, setImages] = useState([]);
@@ -97,7 +97,11 @@ const ImageUploader = () => {
               </div>
             ))}
           </div>
-          <button style={{marginTop:'4rem'}} className="upload-btn" onClick={uploadImages}>
+          <button
+            style={{ marginTop: "4rem" }}
+            className="upload-btn"
+            onClick={uploadImages}
+          >
             Upload Images
           </button>
         </div>
